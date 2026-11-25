@@ -1,5 +1,5 @@
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QSlider, QDoubleSpinBox
-from PySide6.QtCore import Qt , QTimer
+from PySide6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QSlider, QDoubleSpinBox, QComboBox
+from PySide6.QtCore import Qt, QTimer
 from about_window import AboutWindow
 from graph_window import GraphWindow
 from Body import Body
@@ -12,6 +12,8 @@ class HeatTransfer(QWidget):
         super().__init__()
         self.about_window = AboutWindow()
         self.graph_window = GraphWindow(self)
+        self.materials = {"Custom": None, "Copper": 0.385, "Aluminum": 0.900, "Iron": 0.450,
+                          "Gold": 0.129, "Glass": 0.840, "Water": 4.186}
         self.dt = 0.1
         self.time = 0
         self.time_list = []
@@ -24,7 +26,7 @@ class HeatTransfer(QWidget):
 
     def setupUI(self):
         self.setWindowTitle("Heat Transfer Simulation")
-        self.setGeometry(100, 100, 700, 450)
+        self.setGeometry(100, 100, 700, 490)
 
         # ----- title -----
         title_label = QLabel("Heat Transfer Between Two Bodies", self)
@@ -68,7 +70,7 @@ class HeatTransfer(QWidget):
         self.conductivity_spin.setGeometry(290, 110, 120, 30)
         self.conductivity_spin.setRange(0.01, 100)
         self.conductivity_spin.setValue(1.0)
-        self.conductivity_spin.setSuffix(" W/°C")
+        self.conductivity_spin.setSuffix(" kW/°C")
 
         # ----- left body data -----
         left_temp_text = QLabel("Temp.", self)
@@ -92,9 +94,10 @@ class HeatTransfer(QWidget):
 
         self.left_heat_capacity_spin = QDoubleSpinBox(self)
         self.left_heat_capacity_spin.setGeometry(100, 385, 140, 30)
-        self.left_heat_capacity_spin.setRange(0.01, 10000)
-        self.left_heat_capacity_spin.setValue(0.4)
-        self.left_heat_capacity_spin.setSuffix(" J/kg°C")
+        self.left_heat_capacity_spin.setRange(0.01, 100)
+        self.left_heat_capacity_spin.setDecimals(3)
+        self.left_heat_capacity_spin.setValue(0.385)
+        self.left_heat_capacity_spin.setSuffix(" kJ/kg°C")
 
         # ----- right body data -----
         self.right_temp_display = QLabel("0.0 °C", self)
@@ -115,12 +118,34 @@ class HeatTransfer(QWidget):
 
         self.right_heat_capacity_spin = QDoubleSpinBox(self)
         self.right_heat_capacity_spin.setGeometry(460, 385, 140, 30)
-        self.right_heat_capacity_spin.setRange(0.01, 10000)
-        self.right_heat_capacity_spin.setValue(0.4)
-        self.right_heat_capacity_spin.setSuffix(" J/kg°C")
+        self.right_heat_capacity_spin.setRange(0.01, 100)
+        self.right_heat_capacity_spin.setDecimals(3)
+        self.right_heat_capacity_spin.setValue(0.385)
+        self.right_heat_capacity_spin.setSuffix(" kJ/kg°C")
 
         right_heat_capacity_text = QLabel("H. Cap.", self)
         right_heat_capacity_text.setGeometry(610, 385, 70, 30)
+
+        # ----- material selection -----
+        left_material_text = QLabel("Material", self)
+        left_material_text.setGeometry(20, 430, 70, 30)
+
+        self.left_material_combo = QComboBox(self)
+        self.left_material_combo.setGeometry(100, 430, 140, 30)
+        self.left_material_combo.addItems(list(self.materials))
+        self.left_material_combo.setCurrentText("Copper")
+        self.left_material_combo.currentTextChanged.connect(self.left_material_changed)
+        self.left_heat_capacity_spin.valueChanged.connect(self.left_heat_capacity_changed)
+
+        self.right_material_combo = QComboBox(self)
+        self.right_material_combo.setGeometry(460, 430, 140, 30)
+        self.right_material_combo.addItems(list(self.materials))
+        self.right_material_combo.setCurrentText("Copper")
+        self.right_material_combo.currentTextChanged.connect(self.right_material_changed)
+        self.right_heat_capacity_spin.valueChanged.connect(self.right_heat_capacity_changed)
+
+        right_material_text = QLabel("Material", self)
+        right_material_text.setGeometry(610, 430, 70, 30)
 
         # ----- buttons (middle) -----
         self.start_button = QPushButton("Start", self)
@@ -166,7 +191,8 @@ class HeatTransfer(QWidget):
             self.start_button.setText("Start")
 
         for widget in [self.left_temp_slider, self.right_temp_slider, self.left_mass_spin, self.right_mass_spin,
-                    self.left_heat_capacity_spin, self.right_heat_capacity_spin, self.conductivity_spin]:
+                    self.left_heat_capacity_spin, self.right_heat_capacity_spin, self.conductivity_spin,
+                       self.left_material_combo, self.right_material_combo]:
             widget.setEnabled(not checked)
 
     def timer_method(self):
@@ -188,6 +214,22 @@ class HeatTransfer(QWidget):
         if abs(left_temperature - right_temperature) < 0.01:
             self.start_button.setChecked(False)
             self.start_stop(False)
+
+    def left_material_changed(self, material):
+        if self.materials[material] is not None:
+            self.left_heat_capacity_spin.setValue(self.materials[material])
+
+    def right_material_changed(self, material):
+        if self.materials[material] is not None:
+            self.right_heat_capacity_spin.setValue(self.materials[material])
+
+    def left_heat_capacity_changed(self, value):
+        if self.materials[self.left_material_combo.currentText()] != value:
+            self.left_material_combo.setCurrentText("Custom")
+
+    def right_heat_capacity_changed(self, value):
+        if self.materials[self.right_material_combo.currentText()] != value:
+            self.right_material_combo.setCurrentText("Custom")
 
     def graphs_clicked(self):
         self.graph_window.show()
