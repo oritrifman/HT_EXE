@@ -38,6 +38,8 @@ class GraphWindow(QWidget):
 
         self.export_button = QPushButton("Export to CSV", self)
         self.export_button.setGeometry(550, 200, 150, 35)
+        self.draw_button.clicked.connect(self.draw_clicked)
+        self.clear_button.clicked.connect(self.clear_clicked)
 
     def style_axes(self):
         self.ax.set_title("Body Temperature over Time", fontsize=13, color=(0.2, 0.2, 0.3))
@@ -47,3 +49,19 @@ class GraphWindow(QWidget):
         for spine in ["top", "right"]:
             self.ax.spines[spine].set_visible(False)
         self.canvas.draw()
+
+    def draw_clicked(self):
+        if self.body_combo.currentIndex() == 0:
+            temperatures = self.main_window.left_temp_list
+            color = "red"
+        else:
+            temperatures = self.main_window.right_temp_list
+            color = "blue"
+        self.ax.plot(self.main_window.time_list, temperatures, color=color, linewidth=2,
+                     label=self.body_combo.currentText())
+        self.ax.legend()
+        self.canvas.draw()
+
+    def clear_clicked(self):
+        self.ax.clear()
+        self.style_axes()
