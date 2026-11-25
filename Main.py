@@ -5,8 +5,6 @@ from graph_window import GraphWindow
 from Body import Body
 from candle_slider import CandleSlider
 
-
-
 class HeatTransfer(QWidget):
 
     def __init__(self):
@@ -260,7 +258,6 @@ class HeatTransfer(QWidget):
     def closeEvent(self, event):
         self.about_window.close()
         self.graph_window.close()
-
 
 if __name__ == "__main__":
     app = QApplication()

@@ -33,7 +33,7 @@ class AboutWindow(QWidget):
         info_label.setWordWrap(True)
         info_label.setStyleSheet("font-size: 14px;")
 
-        github_label = QLabel('<a style="color: rgb(255, 170, 70);" href="https://github.com/oritrifman/Heat_transfer">Project on GitHub</a>', self)
+        github_label = QLabel('<a style="color: rgb(255, 170, 70);" href="https://github.com/oritrifman/HT_EXE.git">Project on GitHub</a>', self)
         github_label.setGeometry(0, 370, 420, 30)
         github_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         github_label.setOpenExternalLinks(True)
