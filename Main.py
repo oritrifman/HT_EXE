@@ -185,6 +185,10 @@ class HeatTransfer(QWidget):
         self.left_temperature_changed(left_temperature)
         self.right_temperature_changed(right_temperature)
 
+        if abs(left_temperature - right_temperature) < 0.01:
+            self.start_button.setChecked(False)
+            self.start_stop(False)
+
     def graphs_clicked(self):
         self.graph_window.show()
 
