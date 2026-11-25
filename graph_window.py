@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QLabel, QPushButton, QComboBox
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-
+import os
 
 class GraphWindow(QWidget):
 
@@ -40,6 +40,7 @@ class GraphWindow(QWidget):
         self.export_button.setGeometry(550, 200, 150, 35)
         self.draw_button.clicked.connect(self.draw_clicked)
         self.clear_button.clicked.connect(self.clear_clicked)
+        self.export_button.clicked.connect(self.export_clicked)
 
     def style_axes(self):
         self.ax.set_title("Body Temperature over Time", fontsize=13, color=(0.2, 0.2, 0.3))
@@ -65,3 +66,19 @@ class GraphWindow(QWidget):
     def clear_clicked(self):
         self.ax.clear()
         self.style_axes()
+
+    def export_clicked(self):
+        file_name = "heat_transfer_results.csv"
+        try:
+            with open(file_name, "w") as f:
+                f.write("Time (s),Body 1 temperature (C),Body 2 temperature (C)\n")
+                for i in range(len(self.main_window.time_list)):
+                    f.write(f"{self.main_window.time_list[i]:.2f},"
+                            f"{self.main_window.left_temp_list[i]:.3f},"
+                            f"{self.main_window.right_temp_list[i]:.3f}\n")
+            if os.name == "nt":
+                os.startfile(file_name)
+            else:
+                print(f"File saved: {file_name}")
+        except PermissionError:
+            print("Close the CSV file in Excel and try again")
