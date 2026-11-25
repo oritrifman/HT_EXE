@@ -1,17 +1,25 @@
 from PySide6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QSlider, QDoubleSpinBox
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt , QTimer
 from about_window import AboutWindow
 from graph_window import GraphWindow
+from Body import Body
+
 
 
 class HeatTransfer(QWidget):
 
     def __init__(self):
         super().__init__()
-        # add other window variables here
         self.about_window = AboutWindow()
         self.graph_window = GraphWindow(self)
-        # add other needed variables
+        self.dt = 0.1
+        self.time = 0
+        self.time_list = []
+        self.left_temp_list = []
+        self.right_temp_list = []
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.timer_method)
+
         self.setupUI()
 
     def setupUI(self):
@@ -118,6 +126,7 @@ class HeatTransfer(QWidget):
         self.start_button = QPushButton("Start", self)
         self.start_button.setGeometry(300, 295, 100, 35)
         self.start_button.setCheckable(True)
+        self.start_button.clicked.connect(self.start_stop)
 
         self.graphs_button = QPushButton("Graphs", self)
         self.graphs_button.setGeometry(300, 340, 100, 35)
@@ -139,6 +148,40 @@ class HeatTransfer(QWidget):
         self.right_temp_display.setText(f"{value:.1f} °C")
         red = int(value / 200 * 255)
         self.right_body_label.setStyleSheet(f"background-color: rgb({red}, 0, 0); border: 2px solid rgb(60, 60, 60); border-radius: 10px;")
+
+    def start_stop(self, checked):
+        if checked:
+            self.left_body = Body(self.left_mass_spin.value(), self.left_heat_capacity_spin.value(),
+                                self.left_temp_slider.value())
+            self.right_body = Body(self.right_mass_spin.value(), self.right_heat_capacity_spin.value(),
+                                self.right_temp_slider.value())
+            self.time = 0
+            self.time_list = [0]
+            self.left_temp_list = [self.left_body.temperature]
+            self.right_temp_list = [self.right_body.temperature]
+            self.start_button.setText("Stop")
+            self.timer.start(100)
+        else:
+            self.timer.stop()
+            self.start_button.setText("Start")
+
+        for widget in [self.left_temp_slider, self.right_temp_slider, self.left_mass_spin, self.right_mass_spin,
+                    self.left_heat_capacity_spin, self.right_heat_capacity_spin, self.conductivity_spin]:
+            widget.setEnabled(not checked)
+
+    def timer_method(self):
+        heat_current = self.conductivity_spin.value() * (self.right_body.temperature - self.left_body.temperature)
+        heat = heat_current * self.dt
+        left_temperature = self.left_body.add_heat(heat)
+        right_temperature = self.right_body.add_heat(-heat)
+
+        self.time = self.time + self.dt
+        self.time_list.append(self.time)
+        self.left_temp_list.append(left_temperature)
+        self.right_temp_list.append(right_temperature)
+
+        self.left_temperature_changed(left_temperature)
+        self.right_temperature_changed(right_temperature)
 
     def graphs_clicked(self):
         self.graph_window.show()
