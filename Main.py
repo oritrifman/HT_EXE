@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QSlider, QDoubleSpinBox
 from PySide6.QtCore import Qt
 from about_window import AboutWindow
+from graph_window import GraphWindow
 
 
 class HeatTransfer(QWidget):
@@ -9,6 +10,7 @@ class HeatTransfer(QWidget):
         super().__init__()
         # add other window variables here
         self.about_window = AboutWindow()
+        self.graph_window = GraphWindow(self)
         # add other needed variables
         self.setupUI()
 
@@ -117,6 +119,7 @@ class HeatTransfer(QWidget):
 
         self.graphs_button = QPushButton("Graphs", self)
         self.graphs_button.setGeometry(300, 340, 100, 35)
+        self.graphs_button.clicked.connect(self.graphs_clicked)
 
         self.about_button = QPushButton("About", self)
         self.about_button.setGeometry(300, 385, 100, 35)
@@ -124,6 +127,13 @@ class HeatTransfer(QWidget):
 
     def about_clicked(self):
         self.about_window.show()
+
+    def graphs_clicked(self):
+        self.graph_window.show()
+
+    def closeEvent(self, event):
+        self.about_window.close()
+        self.graph_window.close()
 
 
 if __name__ == "__main__":
