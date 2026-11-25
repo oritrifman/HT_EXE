@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QSlider, QDoubleSpinBox, QComboBox
+from PySide6.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QDoubleSpinBox, QComboBox
 from PySide6.QtCore import Qt, QTimer
 from about_window import AboutWindow
 from graph_window import GraphWindow
 from Body import Body
+from candle_slider import CandleSlider
 
 
 
@@ -32,11 +33,11 @@ class HeatTransfer(QWidget):
         title_label = QLabel("Heat Transfer Between Two Bodies", self)
         title_label.setGeometry(0, 15, 700, 30)
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("font-size: 20px; font-weight: bold; color: rgb(40, 40, 60);")
+        title_label.setStyleSheet("font-size: 22px; font-weight: bold; color: rgb(255, 200, 90);")
 
         # ----- left body: slider + color square -----
-        self.left_temp_slider = QSlider(Qt.Orientation.Vertical, self)
-        self.left_temp_slider.setGeometry(40, 70, 30, 200)
+        self.left_temp_slider = CandleSlider(self)
+        self.left_temp_slider.setGeometry(25, 60, 55, 215)
         self.left_temp_slider.setRange(0, 200)
         self.left_temp_slider.setValue(200)
         self.left_temp_slider.valueChanged.connect(self.left_temperature_changed)
@@ -48,15 +49,15 @@ class HeatTransfer(QWidget):
         # ----- the bar between the bodies -----
         bridge_label = QLabel(self)
         bridge_label.setGeometry(240, 160, 220, 40)
-        bridge_label.setStyleSheet("background-color: rgb(170, 170, 170);")
+        bridge_label.setStyleSheet("background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(140, 80, 35), stop:0.5 rgb(230, 160, 90), stop:1 rgb(140, 80, 35)); border-radius: 6px;")
 
         # ----- right body: color square + slider -----
         self.right_body_label = QLabel(self)
         self.right_body_label.setGeometry(460, 70, 150, 200)
         self.right_body_label.setStyleSheet("background-color: rgb(0, 0, 0); border: 2px solid rgb(60, 60, 60); border-radius: 10px;")
 
-        self.right_temp_slider = QSlider(Qt.Orientation.Vertical, self)
-        self.right_temp_slider.setGeometry(630, 70, 30, 200)
+        self.right_temp_slider = CandleSlider(self)
+        self.right_temp_slider.setGeometry(620, 60, 55, 215)
         self.right_temp_slider.setRange(0, 200)
         self.right_temp_slider.setValue(0)
         self.right_temp_slider.valueChanged.connect(self.right_temperature_changed)
@@ -67,7 +68,7 @@ class HeatTransfer(QWidget):
         conductivity_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.conductivity_spin = QDoubleSpinBox(self)
-        self.conductivity_spin.setGeometry(290, 110, 120, 30)
+        self.conductivity_spin.setGeometry(275, 110, 150, 30)
         self.conductivity_spin.setRange(0.01, 100)
         self.conductivity_spin.setValue(1.0)
         self.conductivity_spin.setSuffix(" kW/°C")
@@ -78,7 +79,7 @@ class HeatTransfer(QWidget):
 
         self.left_temp_display = QLabel("200.0 °C", self)
         self.left_temp_display.setGeometry(100, 295, 140, 30)
-        self.left_temp_display.setStyleSheet("background-color: white; color: black; border: 1px solid gray; padding-left: 5px;")
+        self.left_temp_display.setStyleSheet("background-color: rgb(255, 243, 220); color: rgb(50, 25, 10); border: 1px solid rgb(215, 150, 45); border-radius: 5px; padding-left: 5px; font-weight: bold;")
 
         left_mass_text = QLabel("Mass", self)
         left_mass_text.setGeometry(20, 340, 70, 30)
@@ -102,7 +103,7 @@ class HeatTransfer(QWidget):
         # ----- right body data -----
         self.right_temp_display = QLabel("0.0 °C", self)
         self.right_temp_display.setGeometry(460, 295, 140, 30)
-        self.right_temp_display.setStyleSheet("background-color: white; color: black; border: 1px solid gray; padding-left: 5px;")
+        self.right_temp_display.setStyleSheet("background-color: rgb(255, 243, 220); color: rgb(50, 25, 10); border: 1px solid rgb(215, 150, 45); border-radius: 5px; padding-left: 5px; font-weight: bold;")
 
         right_temp_text = QLabel("Temp.", self)
         right_temp_text.setGeometry(610, 295, 70, 30)

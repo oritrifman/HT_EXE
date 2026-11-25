@@ -15,7 +15,7 @@ class GraphWindow(QWidget):
         self.setGeometry(820, 100, 720, 470)
 
         # ----- the graph (matplotlib inside the window) -----
-        self.figure = Figure(facecolor=(0.94, 0.95, 0.96))
+        self.figure = Figure(facecolor=(1.0, 0.95, 0.86))
         self.ax = self.figure.add_subplot(1, 1, 1)
         self.canvas = FigureCanvasQTAgg(self.figure)
         self.canvas.setParent(self)
@@ -43,7 +43,8 @@ class GraphWindow(QWidget):
         self.export_button.clicked.connect(self.export_clicked)
 
     def style_axes(self):
-        self.ax.set_title("Body Temperature over Time", fontsize=13, color=(0.2, 0.2, 0.3))
+        self.ax.set_facecolor((1.0, 0.98, 0.93))
+        self.ax.set_title("Body Temperature over Time", fontsize=13, color=(0.45, 0.2, 0.05))
         self.ax.set_xlabel("Time (s)")
         self.ax.set_ylabel("Temperature (°C)")
         self.ax.grid(True, linestyle="--", alpha=0.4)
@@ -57,7 +58,7 @@ class GraphWindow(QWidget):
             color = "red"
         else:
             temperatures = self.main_window.right_temp_list
-            color = "blue"
+            color = "royalblue"
         self.ax.plot(self.main_window.time_list, temperatures, color=color, linewidth=2,
                      label=self.body_combo.currentText())
         self.ax.legend()
