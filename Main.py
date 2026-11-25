@@ -26,7 +26,7 @@ class HeatTransfer(QWidget):
 
     def setupUI(self):
         self.setWindowTitle("Heat Transfer Simulation")
-        self.setGeometry(100, 100, 700, 490)
+        self.setGeometry(100, 100, 700, 530)
 
         # ----- title -----
         title_label = QLabel("Heat Transfer Between Two Bodies", self)
@@ -147,6 +147,25 @@ class HeatTransfer(QWidget):
         right_material_text = QLabel("Material", self)
         right_material_text.setGeometry(610, 430, 70, 30)
 
+        # ----- heaters -----
+        left_heater_text = QLabel("Heater", self)
+        left_heater_text.setGeometry(20, 475, 70, 30)
+
+        self.left_heater_spin = QDoubleSpinBox(self)
+        self.left_heater_spin.setGeometry(100, 475, 140, 30)
+        self.left_heater_spin.setRange(0, 10)
+        self.left_heater_spin.setValue(0)
+        self.left_heater_spin.setSuffix(" kW")
+
+        self.right_heater_spin = QDoubleSpinBox(self)
+        self.right_heater_spin.setGeometry(460, 475, 140, 30)
+        self.right_heater_spin.setRange(0, 10)
+        self.right_heater_spin.setValue(0)
+        self.right_heater_spin.setSuffix(" kW")
+
+        right_heater_text = QLabel("Heater", self)
+        right_heater_text.setGeometry(610, 475, 70, 30)
+
         # ----- buttons (middle) -----
         self.start_button = QPushButton("Start", self)
         self.start_button.setGeometry(300, 295, 100, 35)
@@ -166,12 +185,12 @@ class HeatTransfer(QWidget):
 
     def left_temperature_changed(self, value):
         self.left_temp_display.setText(f"{value:.1f} °C")
-        red = int(value / 200 * 255)
+        red = min(int(value / 200 * 255), 255)
         self.left_body_label.setStyleSheet(f"background-color: rgb({red}, 0, 0); border: 2px solid rgb(60, 60, 60); border-radius: 10px;")
 
     def right_temperature_changed(self, value):
         self.right_temp_display.setText(f"{value:.1f} °C")
-        red = int(value / 200 * 255)
+        red = min(int(value / 200 * 255), 255)
         self.right_body_label.setStyleSheet(f"background-color: rgb({red}, 0, 0); border: 2px solid rgb(60, 60, 60); border-radius: 10px;")
 
     def start_stop(self, checked):
@@ -198,8 +217,10 @@ class HeatTransfer(QWidget):
     def timer_method(self):
         heat_current = self.conductivity_spin.value() * (self.right_body.temperature - self.left_body.temperature)
         heat = heat_current * self.dt
-        left_temperature = self.left_body.add_heat(heat)
-        right_temperature = self.right_body.add_heat(-heat)
+        left_heater_heat = self.left_heater_spin.value() * self.dt
+        right_heater_heat = self.right_heater_spin.value() * self.dt
+        left_temperature = self.left_body.add_heat(heat + left_heater_heat)
+        right_temperature = self.right_body.add_heat(-heat + right_heater_heat)
 
         self.time = self.time + self.dt
         self.time_list.append(self.time)
@@ -211,7 +232,8 @@ class HeatTransfer(QWidget):
         self.left_temperature_changed(left_temperature)
         self.right_temperature_changed(right_temperature)
 
-        if abs(left_temperature - right_temperature) < 0.01:
+        heaters_off = self.left_heater_spin.value() == 0 and self.right_heater_spin.value() == 0
+        if heaters_off and abs(left_temperature - right_temperature) < 0.01:
             self.start_button.setChecked(False)
             self.start_stop(False)
 
