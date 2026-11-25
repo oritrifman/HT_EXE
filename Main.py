@@ -29,6 +29,7 @@ class HeatTransfer(QWidget):
         self.left_temp_slider.setGeometry(40, 70, 30, 200)
         self.left_temp_slider.setRange(0, 200)
         self.left_temp_slider.setValue(200)
+        self.left_temp_slider.valueChanged.connect(self.left_temperature_changed)
 
         self.left_body_label = QLabel(self)
         self.left_body_label.setGeometry(90, 70, 150, 200)
@@ -48,7 +49,8 @@ class HeatTransfer(QWidget):
         self.right_temp_slider.setGeometry(630, 70, 30, 200)
         self.right_temp_slider.setRange(0, 200)
         self.right_temp_slider.setValue(0)
-
+        self.right_temp_slider.valueChanged.connect(self.right_temperature_changed)
+        
         # ----- conductivity (above the bar) -----
         conductivity_label = QLabel("Conductivity", self)
         conductivity_label.setGeometry(290, 85, 120, 20)
@@ -127,6 +129,16 @@ class HeatTransfer(QWidget):
 
     def about_clicked(self):
         self.about_window.show()
+
+    def left_temperature_changed(self, value):
+        self.left_temp_display.setText(f"{value:.1f} °C")
+        red = int(value / 200 * 255)
+        self.left_body_label.setStyleSheet(f"background-color: rgb({red}, 0, 0); border: 2px solid rgb(60, 60, 60); border-radius: 10px;")
+
+    def right_temperature_changed(self, value):
+        self.right_temp_display.setText(f"{value:.1f} °C")
+        red = int(value / 200 * 255)
+        self.right_body_label.setStyleSheet(f"background-color: rgb({red}, 0, 0); border: 2px solid rgb(60, 60, 60); border-radius: 10px;")
 
     def graphs_clicked(self):
         self.graph_window.show()
