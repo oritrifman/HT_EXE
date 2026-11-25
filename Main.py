@@ -180,6 +180,8 @@ class HeatTransfer(QWidget):
         self.left_temp_list.append(left_temperature)
         self.right_temp_list.append(right_temperature)
 
+        self.left_temp_slider.setValue(int(left_temperature))
+        self.right_temp_slider.setValue(int(right_temperature))
         self.left_temperature_changed(left_temperature)
         self.right_temperature_changed(right_temperature)
 
